@@ -1,4 +1,4 @@
-from model import Data_Extractor
+from model import Data_Extractor, Data_Cleaning
 from multiprocessing import Manager, Process
 
 data_extraction = Data_Extractor('https://www.polkastarter.com/projects')
