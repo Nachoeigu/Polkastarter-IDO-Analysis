@@ -2,6 +2,8 @@ from requests_html import AsyncHTMLSession
 import asyncio
 from bs4 import BeautifulSoup
 import pandas as pd
+from constants import basic_headers
+import random
 
 class Data_Extractor:
    
@@ -19,7 +21,8 @@ class Data_Extractor:
             self.urls.append(url)
 
     async def request(self,url):
-        response = await self.asession.get(url)
+        header = random.choice(basic_headers)   
+        response = await self.asession.get(url, header)
         await response.html.arender(timeout = 10)
         response = response.html.raw_html
         return response
