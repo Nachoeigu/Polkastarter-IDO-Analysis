@@ -1,0 +1,4 @@
+requests_html==0.10.0
+asyncio
+bs4
+pandas

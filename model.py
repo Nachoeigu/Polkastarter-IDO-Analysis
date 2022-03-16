@@ -13,7 +13,7 @@ class Data_Extractor:
         self.urls = []
 
     def generating_urls(self):
-        for number in range(1,3):
+        for number in range(1,10):
             if number == 1:
                 url = self.url_without_params
             else:
@@ -22,23 +22,27 @@ class Data_Extractor:
 
     async def request(self,url):
         header = random.choice(basic_headers)   
-        response = await self.asession.get(url, header)
-        await response.html.arender(timeout = 10)
+        response = await self.asession.get(url = url,headers = header)
+        print(f"Extracting information for url: {url}")
+        await response.html.arender(timeout = 20)
         response = response.html.raw_html
+        print(f"We received the response from the server in the url: {url}")
         return response
 
     def main(self):
         self.generating_urls()
         self.list_of_responses = self.asession.run(*[lambda url = url: self.request(url) for url in self.urls])
+        print("Finished extraction from the server")
         
-        
-class Data_Cleaning(Data_Extraction):
+class Data_Cleaning(Data_Extractor):
     
     def __init__(self, data_extraction):
         self.list_of_responses = data_extraction.list_of_responses
         
     def __byte_to_bs4(self, byte_file):
+        print('Starting the cleaning process')
         return BeautifulSoup(byte_file,'lxml')
+        
     
     def parsing_data(self, index, lista):
         #We convert the byte object into a bs4 object
@@ -61,7 +65,10 @@ class Data_Cleaning(Data_Extraction):
             lista.append(string)
             
     def generating_dataframe(self, lista):
-        df = pd.DataFrame({'content':listas})
+        #The list is a multiprocessing.manager.ListProxy so we need to pass it to a traditional list
+        lista = [element for element in lista]
+
+        df = pd.DataFrame({'content':lista})
         df = df['content'].str.split(' -- ', expand = True)
         self.df = df.rename({0:'money',
                         1:'participants',
